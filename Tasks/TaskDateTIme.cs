@@ -1,102 +1,100 @@
-﻿using System.Globalization;
-using System.Text;
+﻿using System;
+using System.Collections.Generic;
 
-namespace DAY1_DEMO
+namespace App_DateCompare;
+class DateCompare
 {
-    internal class TaskDateTIme
+    
+    
+    static void Main(string[] args)
     {
-        static DateTime dt = new DateTime();
-        static void MainFn()
+        string LoopFlag = String.Empty;
+
+        do
         {
-            string UserInp = "";
-            bool flag = true;
-            bool checkedFlag = false;
-            do
+            Console.WriteLine("--------Please Enter Date in  \"DDMMYYYY\" Format--------");
+            Console.WriteLine("******Enter First Date*******");
+            string dateInput1 = Console.ReadLine().Trim();
+            string dateInput2=string.Empty;
+
+            List<int> dateList1 = new List<int>();
+            List<int> dateList2 = new List<int>();
+            DateCompare dateCompare = new DateCompare();
+            dateList1 = dateCompare.DateVerify(dateInput1);
+            if(dateList1.Count > 0)
             {
-                Console.WriteLine("------------Please Enter Your Date Of Birth in the format-----\n \t-DD//MM//YYYY \n \t-DD-MM-YYYY \n \t-YYYY\\MM\\DD \n \t-YYYY-MM-DD \n \t-DDMMYYYY");
-                UserInp = Console.ReadLine().Trim();
-
-                checkedFlag = CheckFormat(UserInp);
-                if (checkedFlag)
-                {
-                    Console.WriteLine("**********Your Date Of Birth is {0}-{1}-{2}*************", dt.Day, CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(dt.Month), dt.Year);
-                }
-                else
-                {
-                    Console.WriteLine("Invalid Format");
-                }
-                Console.WriteLine("--------Want To Give Input Again?\n Press 'Y' to confirm and press any key to terminate------");
-                UserInp = Console.ReadLine().Trim();
-                if (UserInp == "Y")
-                {
-                    flag = true;
-                }
-                else
-                {
-                    flag = false;
-                }
-            } while (flag);
-        }
-
-        static bool CheckFormat(string inp)
-        {
-
-            DateTime UserDOB;
-            var isvalid = DateTime.TryParse(inp, out UserDOB);
-            //Console.WriteLine(inp);
-            //Console.WriteLine(isvalid);
-            if (!isvalid)
-            {
-                var input = ConvertToDate(inp);
-                var isvalidated = DateTime.TryParse(input, out UserDOB);
-                if (!isvalidated) { return false; }
-
+                Console.WriteLine("******Enter Second Date*******");
+                dateInput2 = Console.ReadLine().Trim();
             }
-            dt = UserDOB;
-            return true;
-        }
-
-        static string ConvertToDate(string inp)
-        {
-            StringBuilder stringDate = new StringBuilder();
-            string dd = "";
-            string mm = "";
-            string yy = "";
-            if (inp.Length == 8)
+            dateList2 = dateCompare.DateVerify(dateInput2);
+            if (dateList1.Count!=0 && dateList2.Count!=0 )
             {
-
-
-                try
-                {
-                    for (int count = 0; count < inp.Length; count++)
-                    {
-                        if (count == 1)
-                        {
-                            dd = inp.Substring(0, 2);
-                            //inp.Substring(0,2);
-                        }
-                        else if (count == 3)
-                        {
-                            mm = inp.Substring(2, 2);
-                        }
-                        else if (count == 7)
-                        {
-                            yy = inp.Substring(4, 4);
-                        }
-                    }
-                    stringDate.Append(dd + "-" + mm + "-" + yy);
-                    //Console.WriteLine(stringDate.ToString());
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Sorry Not in Date Format");
-                    //Console.WriteLine(ex.ToString());
-                    return "";
-                }
-                return stringDate.ToString();
+                Console.WriteLine(dateCompare.DateDifference(dateList1, dateList2));
             }
-
-            return "";
+            else
+            {
+                Console.WriteLine("Invalid Input");
+            }
+            Console.WriteLine("Do you want to print Again? press y/n");
+            LoopFlag = Console.ReadLine();
         }
+        while (LoopFlag=="y");
     }
+
+    internal List<int> DateVerify(string data)
+    {
+        List<int> list = new List<int>();
+        var dateIndices = (0, 2);
+        var monthIndices = (2, 2);
+        var yearIndices = (4, 4);
+        byte monthLimit = 12;
+        byte feb = 2;
+        try
+        {
+            int day = int.Parse(data.Substring(dateIndices.Item1,dateIndices.Item2).Trim());
+            day = Math.Abs(day);
+            
+            int month = int.Parse(data.Substring(monthIndices.Item1, monthIndices.Item2).Trim());
+            month = Math.Abs(month);
+
+            int year = int.Parse(data.Substring(yearIndices.Item1,yearIndices.Item2).Trim());
+            month = Math.Abs(month);
+            if (day < DateTime.DaysInMonth(year,month) && month <= monthLimit && day!=0 && month!=0 && year!=0) 
+            {
+                if(month==feb && day > DateTime.DaysInMonth(year,month))
+                {
+                    throw new Exception();
+                }
+                list.Add(day);
+                list.Add(month);
+                list.Add(year);
+            }
+            else
+            {
+                throw new Exception();
+            }
+        }
+        catch (Exception ex) {
+            
+            return list;
+        }
+        return list;
+    }
+
+    internal string DateDifference(List<int> dateList1,List<int> dateList2) {
+        
+            var day = "Diff In Day=" + Math.Abs(dateList1[0] - dateList2[0]);
+            var month = " Month=" + Math.Abs(dateList1[1] - dateList2[1]);
+            var year = " year=" + Math.Abs(dateList1[2] - dateList2[2]);
+        string diff = day+month+year;
+
+        return diff;
+    
+    }
+
+   
+
+    
+  
+    
 }
